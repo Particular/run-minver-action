@@ -4,7 +4,7 @@ Installs and runs MinVer using the CLI and conventions of repos in the Particula
 
 * MinVer settings may exist in `src/Custom.Build.props`
 
-
+The version calculated by MinVer is written to the environment variable `MinVerVersion`, the same as if MinVer is run from the MSBuild task.
 
 ## Usage
 
