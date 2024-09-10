@@ -1,0 +1,29 @@
+name: Run MinVer
+description: Runs MinVer using the CLI and conventions of repos in the Particular org
+inputs:
+outputs:
+  version:
+    description: The version as calculated by MinVer
+    value: ${{ steps.calc.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - name: Install MinVer CLI
+      run: dotnet tool install --global minver-cli
+    - name: Determine versions
+      id: calc
+      shell: pwsh
+      run: |
+        # Read settings from Custom.Build.props
+        [xml]$xml = Get-Content ./src/Custom.Build.props
+        $minMajorMinor = $xml.selectNodes('/Project/PropertyGroup/MinVerMinimumMajorMinor').InnerText
+        $autoIncrement = $xml.selectNodes('/Project/PropertyGroup/MinVerAutoIncrement').InnerText
+        echo "MinVerMinimumMajorMinor=$minMajorMinor, MinVerAutoIncrement=$autoIncrement"
+        if (-not ($minMajorMinor -and $autoIncrement)) {
+          throw "Missing MinVer settings in Custom.Build.props"
+        }
+
+        # Execute MinVer
+        $version = $(minver --minimum-major-minor $minMajorMinor --auto-increment $autoIncrement)
+        echo "version=$version" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        
