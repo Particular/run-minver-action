@@ -4,6 +4,7 @@ runs:
   using: composite
   steps:
     - name: Install MinVer CLI
+      shell: bash
       run: dotnet tool install --global minver-cli
     - name: Determine versions
       shell: pwsh
@@ -19,4 +20,3 @@ runs:
 
         # Execute MinVer
         echo "MinVerVersion=$(minver --minimum-major-minor $minMajorMinor --auto-increment $autoIncrement)" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-        
